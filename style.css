@@ -1,0 +1,89 @@
+:root {
+  --hidden-color: #444444;
+  --correct-color: #b3b3b3;
+  --latest-guess-color: #00ff00;
+}
+
+body {
+  margin: 0;
+  font-size: 150%;
+}
+
+h1 {
+  text-align: center;
+}
+
+#input-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+#input-wrapper.shake {
+  animation: horizontal-shaking 0.5s ease-in-out;
+}
+
+@keyframes horizontal-shaking {
+  0% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(1%);
+  }
+  50% {
+    transform: translateX(-1%);
+  }
+  75% {
+    transform: translateX(1%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+#input {
+  font-family: monospace;
+  outline: none;
+  border: 1px solid #000000;
+  border-right: none;
+}
+
+#input-button {
+  font-family: monospace;
+  border: 1px solid #000000;
+}
+
+#text {
+  font-family: monospace;
+  margin: 20px;
+}
+
+#text .word .letter {
+  background: var(--hidden-color);
+  color: var(--hidden-color);
+}
+
+#text .word .letter.correct {
+  background: var(--correct-color);
+}
+
+#text .word .latest-guess {
+  background: var(--latest-guess-color) !important;
+}
+
+#spinner {
+  display: inline-block;
+  animation: spin 1s linear infinite;
+  position: absolute;
+  left: 50%;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
