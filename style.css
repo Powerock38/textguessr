@@ -7,10 +7,24 @@
 body {
   margin: 0;
   font-size: 150%;
+  font-family: monospace;
 }
 
 h1 {
   text-align: center;
+}
+
+#api-select {
+  font-family: inherit;
+  font-size: 100%;
+  font-weight: bold;
+  border: 3px dotted #d4d4d4;
+  background: none;
+  direction: rtl;
+}
+
+#api-select option {
+  font-family: inherit;
 }
 
 #input-wrapper {
@@ -43,19 +57,18 @@ h1 {
 }
 
 #input {
-  font-family: monospace;
+  font-family: inherit;
   outline: none;
   border: 1px solid #000000;
   border-right: none;
 }
 
 #input-button {
-  font-family: monospace;
+  font-family: inherit;
   border: 1px solid #000000;
 }
 
 #text {
-  font-family: monospace;
   margin: 20px;
 }
 

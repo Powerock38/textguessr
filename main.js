@@ -1,15 +1,30 @@
-const WORDLIST = new Set(await fetch('mots.txt').then(res => res.text()).then(text => text.split('\n')));
+import apis from './apis.js';
 
-const MIN_LETTERS_TO_REVEAL = 2;
+const DEFAULT_API = 'wikipedia';
+const queryParams = new URLSearchParams(window.location.search);
+const API = queryParams.get("api") ?? DEFAULT_API;
 
-const TEXT = await fetch('https://fr.wikipedia.org/w/api.php?action=query&prop=extracts&format=json&generator=random&grnnamespace=0&exintro&explaintext&origin=*')
-  .then(res => res.json())
-  .then(json => {
-    const page = Object.values(json.query.pages)[0];
-    return page.title + '\n\n' + page.extract;
-  });
+const apiSelect = document.getElementById('api-select');
+apiSelect.value = API;
+apiSelect.onchange = () => {
+  const queryParams = new URLSearchParams(window.location.search);
+  queryParams.set("api", apiSelect.value);
+  window.location.search = queryParams.toString();
+}
 
-let TOKENS = [];
+if (!apis[API]) {
+  apiSelect.value = DEFAULT_API;
+  apiSelect.onchange();
+  throw new Error(`API "${API}" not found`);
+}
+
+const TEXT = (await apis[API]()).trim();
+
+console.log(TEXT);
+
+const WORDLIST = new Set(await fetch('words/fr.txt').then(res => res.text()).then(text => text.split('\n')));
+
+const TOKENS = [];
 
 const textDiv = document.getElementById('text');
 
@@ -45,6 +60,7 @@ function initTokens() {
       type: 'word',
       value: currentWord
     });
+    WORDLIST.add(normalize(currentWord)); // Make sure the word is in the wordlist
   }
 
   if (currentPunctuation !== '') {
@@ -55,7 +71,7 @@ function initTokens() {
   }
 }
 
-function updateText() {
+function initText() {
   textDiv.innerHTML = '';
 
   for (const token of TOKENS) {
@@ -100,86 +116,106 @@ inputButton.onclick = () => {
 
   let foundOne = false;
 
-  if (WORDLIST.has(inputClean)) {
+  for (const inputWord of inputClean.split(' ')) {
 
-    for (const word of TOKENS.filter(token => token.type === 'word' && !token.correct)) {
-      const wordNormalized = normalize(word.value);
-      let letterIndexesToReveal = [];
+    if (WORDLIST.has(inputWord)) {
 
-      let started = false;
-      let letterInputIndex = 0;
+      for (const word of TOKENS.filter(token => token.type === 'word' && !token.correct)) {
+        const wordNormalized = normalize(word.value);
+        let letterIndexesToReveal = [];
 
-      for (let i = 0; i < wordNormalized.split('').length; i++) {
-        const letterWord = wordNormalized[i];
-        const letterInput = inputClean[letterInputIndex];
+        let started = false;
+        let letterInputIndex = 0;
 
-        if (letterInput === letterWord) {
-          if (!started) {
-            console.log("starting for", wordNormalized);
-            started = true;
-          }
+        for (let i = 0; i < wordNormalized.split('').length; i++) {
+          const letterWord = wordNormalized[i];
+          const letterInput = inputWord[letterInputIndex];
 
-          console.log(letterInput, "matches", letterWord);
+          if (letterInput === letterWord) {
+            if (!started) {
+              console.log("starting for", wordNormalized);
+              started = true;
+            }
 
-          letterIndexesToReveal.push(i);
+            console.log(letterInput, "matches", letterWord);
 
-          letterInputIndex++;
+            letterIndexesToReveal.push(i);
 
-          if (letterInputIndex === inputClean.length) {
-            console.log("finished (end of input)");
+            letterInputIndex++;
+
+            if (letterInputIndex === inputWord.length) {
+              console.log("finished (end of input)");
+              break;
+            }
+          } else if (started) {
+            console.log(letterInput, "doesn't match", letterWord);
             break;
           }
-        } else if (started) {
-          console.log(letterInput, "doesn't match", letterWord);
-          break;
+
+          if (started && i === wordNormalized.length - 1) {
+            console.log("finished (end of word)");
+          }
         }
 
-        if (started && i === wordNormalized.length - 1) {
-          console.log("finished (end of word)");
-        }
-      }
+        // Only reveal if at least {MIN_LETTERS_TO_REVEAL} letters are correct or if the word is fully correct
+        if (started) {
+          if (
+            (letterIndexesToReveal.length === wordNormalized.length || letterIndexesToReveal.length >= 2) // Reveal fully correct words or words with at least 2 letters correct
+            && inputWord.length <= letterIndexesToReveal.length + 2 // Prevent revealing short words with long inputs, with a small margin
+          ) {
+            for (const i of letterIndexesToReveal) {
+              if (!foundOne) {
+                // Clear latest-guess classes before adding new ones
+                for (const letterElement of document.querySelectorAll('.latest-guess')) {
+                  letterElement.classList.remove('latest-guess');
+                }
+              }
 
-      // Only reveal if at least {MIN_LETTERS_TO_REVEAL} letters are correct or if the word is fully correct
-      if (started) {
-        if (
-          (letterIndexesToReveal.length === wordNormalized.length || letterIndexesToReveal.length >= MIN_LETTERS_TO_REVEAL)
-          && inputClean.length <= letterIndexesToReveal.length + 2 // Prevent revealing short words with long inputs, with a small margin
-        ) {
-          for (const i of letterIndexesToReveal) {
-            if (!foundOne) {
-              // Clear latest-guess classes before adding new ones
-              for (const letterElement of document.querySelectorAll('.latest-guess')) {
-                letterElement.classList.remove('latest-guess');
+              word.element.children[i].innerText = word.value[i];
+              word.element.children[i].classList.add('correct', 'latest-guess');
+              foundOne = true;
+            }
+
+            // Mark if word is fully revealed
+            if ([...word.element.children].every(letterElement => letterElement.classList.contains('correct'))) {
+              word.correct = true;
+              for (const letterElement of word.element.children) {
+                letterElement.classList.remove('letter', 'correct');
               }
             }
-
-            word.element.children[i].innerText = word.value[i];
-            word.element.children[i].classList.add('correct', 'latest-guess');
-            foundOne = true;
+          } else {
+            console.log("discarding match", wordNormalized);
           }
-
-          // Mark if word is fully revealed
-          if ([...word.element.children].every(letterElement => letterElement.classList.contains('correct'))) {
-            word.correct = true;
-            for (const letterElement of word.element.children) {
-              letterElement.classList.remove('letter', 'correct');
-            }
-          }
-        } else {
-          console.log("discarding match", wordNormalized);
         }
       }
-    }
 
-    input.value = '';
-    input.focus();
+      input.value = '';
+      input.focus();
+    }
   }
 
-  if (!foundOne) {
+  if (foundOne) {
+    checkWin();
+  } else {
     addRemoveClass(inputWrapper, 'shake', 500, () => {
       input.value = '';
       input.focus();
     });
+  }
+}
+
+function checkWin() {
+  let firstLineWords = [];
+  let i = 0;
+  while (i < TOKENS.length && !TOKENS[i].value.includes('\n\n')) {
+    if (TOKENS[i].type === 'word') {
+      firstLineWords.push(TOKENS[i]);
+    }
+    i++;
+  }
+
+  if (firstLineWords.every(word => word.correct)) {
+    console.log("You win!");
   }
 }
 
@@ -192,7 +228,7 @@ input.addEventListener('keydown', e => {
 function init() {
   input.focus();
   initTokens();
-  updateText();
+  initText();
 }
 
 init();
