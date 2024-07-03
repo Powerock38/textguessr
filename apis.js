@@ -51,8 +51,7 @@ async function musixmatch() {
   return await fetch('https://corsproxy.io/?' + encodeURIComponent(`https://api.musixmatch.com/ws/1.1/track.lyrics.get?apikey=2c2d825eae36d569b96d768531590236&track_id=${trackId}`))
     .then(res => res.json())
     .then(json => {
-      const lyrics = json.message.body.lyrics.lyrics_body
-        .replace("...\n\n******* This Lyrics is NOT for Commercial use *******", '');
+      const lyrics = json.message.body.lyrics.lyrics_body.split('*******')[0].trim();
 
       return title + '\n' + artist + '\n\n' + lyrics;
     });
