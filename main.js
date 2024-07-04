@@ -34,6 +34,32 @@ if (isNaN(new Date(DATE))) {
   dateInput.onchange();
 }
 
+// Save
+const deleteSaveButton = document.getElementById('delete-save');
+deleteSaveButton.onclick = () => {
+  if (confirm("Are you sure you want to delete your save?")) {
+    localStorage.removeItem(getSaveKey());
+    location.reload();
+  }
+}
+
+function getSaveKey() {
+  return `${API}|${DATE}`;
+}
+
+function save(guess) {
+  let key = getSaveKey();
+  let save = JSON.parse(localStorage.getItem(key) ?? '[]');
+  localStorage.setItem(getSaveKey(), JSON.stringify([...save, guess]));
+}
+
+function loadSave() {
+  let key = getSaveKey();
+  for (const guess of JSON.parse(localStorage.getItem(key) ?? '[]')) {
+    sendInput(guess);
+  }
+}
+
 // Text
 const TEXT = (await apis[API](DATE)).trim();
 
@@ -134,9 +160,8 @@ const inputWrapper = document.getElementById('input-wrapper');
 const input = document.getElementById('input');
 const inputButton = document.getElementById('input-button');
 
-inputButton.onclick = () => {
-  const inputClean = normalize(input.value);
-
+// returns bool foundOne
+function sendInput(inputClean) {
   let foundOne = false;
 
   for (const inputWord of inputClean.split(' ')) {
@@ -218,7 +243,15 @@ inputButton.onclick = () => {
     }
   }
 
+  return foundOne;
+}
+
+inputButton.onclick = () => {
+  const inputClean = normalize(input.value);
+  const foundOne = sendInput(inputClean);
+
   if (foundOne) {
+    save(inputClean);
     checkWin();
   } else {
     addRemoveClass(inputWrapper, 'shake', 500, () => {
@@ -256,5 +289,4 @@ function init() {
 }
 
 init();
-
-console.log(TOKENS);
+loadSave();
