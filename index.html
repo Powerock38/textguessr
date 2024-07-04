@@ -11,15 +11,23 @@
 </head>
 
 <body>
-  <h1>
-    <select id="api-select">
-      <option selected hidden></option>
-      <option value="wikipedia">Wiki</option>
-      <option value="tmdb_film">Film</option>
-      <option value="tmdb_tv">TV</option>
-      <option value="musixmatch">Lyrics</option>
-    </select>Guessr
-  </h1>
+  <div id="title">
+    <div></div>
+
+    <h1>
+      <select id="api-select">
+        <option selected hidden></option>
+        <option value="wikipedia">Wiki</option>
+        <option value="tmdb_film">Film</option>
+        <option value="tmdb_tv">TV</option>
+        <option value="musixmatch">Lyrics</option>
+      </select>Guessr
+    </h1>
+
+    <div>
+      <input type="date" id="date" />
+    </div>
+  </div>
 
   <div id="input-wrapper">
     <input id="input" type="text" placeholder="..." />

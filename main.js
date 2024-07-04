@@ -1,13 +1,15 @@
 import apis from './apis.js';
 
-const DEFAULT_API = 'wikipedia';
-const queryParams = new URLSearchParams(window.location.search);
-const API = queryParams.get("api") ?? DEFAULT_API;
+const MIN_LETTERS_TO_REVEAL = 2;
 
+const queryParams = new URLSearchParams(window.location.search);
+
+// API selection
+const DEFAULT_API = 'wikipedia';
+const API = queryParams.get("api") ?? DEFAULT_API;
 const apiSelect = document.getElementById('api-select');
 apiSelect.value = API;
 apiSelect.onchange = () => {
-  const queryParams = new URLSearchParams(window.location.search);
   queryParams.set("api", apiSelect.value);
   window.location.search = queryParams.toString();
 }
@@ -15,14 +17,35 @@ apiSelect.onchange = () => {
 if (!apis[API]) {
   apiSelect.value = DEFAULT_API;
   apiSelect.onchange();
-  throw new Error(`API "${API}" not found`);
 }
 
-const TEXT = (await apis[API]()).trim();
+// Date picker
+const DEFAULT_DATE = new Date().toISOString().split('T')[0]
+const DATE = queryParams.get("date") ?? DEFAULT_DATE;
+const dateInput = document.getElementById('date');
+dateInput.value = DATE;
+dateInput.onchange = () => {
+  queryParams.set("date", dateInput.value);
+  window.location.search = queryParams.toString();
+}
+
+if (isNaN(new Date(DATE))) {
+  dateInput.value = DEFAULT_DATE;
+  dateInput.onchange();
+}
+
+// Text
+const TEXT = (await apis[API](DATE)).trim();
 
 console.log(TEXT);
 
-const WORDLIST = new Set(await fetch('words/fr.txt').then(res => res.text()).then(text => text.split('\n')));
+async function loadWordList(file) {
+  return await fetch(`words/${file}.txt`).then(res => res.text()).then(text => text.split(/\r?\n/));
+}
+
+const WORDLIST = new Set((await loadWordList('fr')).concat(await loadWordList('en')));
+
+console.log(WORDLIST.size, "words loaded");
 
 const TOKENS = [];
 
@@ -157,10 +180,9 @@ inputButton.onclick = () => {
           }
         }
 
-        // Only reveal if at least {MIN_LETTERS_TO_REVEAL} letters are correct or if the word is fully correct
         if (started) {
           if (
-            (letterIndexesToReveal.length === wordNormalized.length || letterIndexesToReveal.length >= 2) // Reveal fully correct words or words with at least 2 letters correct
+            (letterIndexesToReveal.length === wordNormalized.length || letterIndexesToReveal.length >= MIN_LETTERS_TO_REVEAL) // Reveal fully correct words or words with at least {MIN_LETTERS_TO_REVEAL} letters correct
             && inputWord.length <= letterIndexesToReveal.length + 2 // Prevent revealing short words with long inputs, with a small margin
           ) {
             for (const i of letterIndexesToReveal) {
@@ -191,6 +213,8 @@ inputButton.onclick = () => {
 
       input.value = '';
       input.focus();
+    } else {
+      console.log("Word not found in wordlist:", inputWord);
     }
   }
 
@@ -232,3 +256,5 @@ function init() {
 }
 
 init();
+
+console.log(TOKENS);
