@@ -12,7 +12,7 @@ deleteSaveButton.onclick = () => {
 }
 
 function getSaveKey() {
-  return `${API}|${DATE}`;
+  return `${LANG}|${API}|${DATE}`;
 }
 
 function getSaveValue() {
