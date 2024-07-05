@@ -35,6 +35,23 @@ if (isNaN(new Date(DATE))) {
   dateInput.onchange();
 }
 
+// Lang
+const DEFAULT_LANG = 'fr';
+export const LANG = queryParams.get("lang") ?? DEFAULT_LANG;
+const langSelect = document.getElementById('lang-select');
+langSelect.value = LANG;
+langSelect.onchange = () => {
+  queryParams.set("lang", langSelect.value);
+  window.location.search = queryParams.toString();
+}
+
+if (LANG !== 'fr' && LANG !== 'en') {
+  langSelect.value = DEFAULT_LANG;
+  langSelect.onchange();
+}
+
+// Guess input
+
 const inputWrapper = document.getElementById('input-wrapper');
 const input = document.getElementById('input');
 const inputButton = document.getElementById('input-button');
@@ -47,8 +64,8 @@ inputButton.onclick = () => {
     save(inputClean);
     checkWin();
   } else {
+    input.value = '';
     addRemoveClass(inputWrapper, 'shake', 500, () => {
-      input.value = '';
       input.focus();
     });
   }
@@ -61,7 +78,7 @@ input.addEventListener('keydown', e => {
 });
 
 async function init() {
-  const text = (await apis[API](DATE)).trim();
+  const text = (await apis[API]()).trim();
   log(text);
 
   input.focus();

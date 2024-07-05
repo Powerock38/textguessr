@@ -1,3 +1,4 @@
+import { LANG } from './main.js';
 import { addRemoveClass, log } from './utils.js';
 
 const MIN_LETTERS_TO_REVEAL = 2;
@@ -186,6 +187,8 @@ export function checkWin() {
 
   if (firstLineWords.every(word => word.correct)) {
     log("You win!");
+
+    winDiv.innerText = LANG === 'fr' ? "Victoire !" : "You win !";
 
     if (new URLSearchParams(window.location.search).has('funky')) {
       const emojis = ['🎉', '✨', '🥳', '🎊', '🍾', '🌟', '🎁', '🔥', '🍻', '🎶', '❤️'];

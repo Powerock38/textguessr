@@ -1,10 +1,11 @@
-import { API, DATE } from './main.js'
+import { API, DATE, LANG } from './main.js'
 import { sendInput } from './game.js';
 
 const deleteSaveButton = document.getElementById('delete-save');
 deleteSaveButton.onclick = () => {
-  if (confirm("Are you sure you want to delete your save?")) {
-    let key = getSaveKey();
+  let key = getSaveKey();
+  if (confirm(LANG === 'fr' ? `Êtes vous sûr de supprimer votre sauvegarde ${key} ?`
+    : `Are you sure you want to delete your save ${key}?`)) {
     localStorage.removeItem(key);
     window.location.reload();
   }

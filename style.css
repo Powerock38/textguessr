@@ -144,9 +144,9 @@ h1 {
   right: 0;
   bottom: -2rem;
   left: 0;
-  background-image: linear-gradient(red, yellow, green);
+  background-image: linear-gradient(red, yellow, green, blue, purple, pink);
   animation: rotate-gradient linear 1s infinite;
-  scale: 2;
+  scale: 3;
 }
 
 @keyframes rotate-gradient {
@@ -159,4 +159,6 @@ h1 {
   position: absolute;
   top: 50%;
   left: 50%;
+  text-shadow: none;
+  font-size: initial;
 }

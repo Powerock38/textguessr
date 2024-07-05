@@ -11,3 +11,16 @@ export function addRemoveClass(element, className, duration, callback) {
     if (callback) callback()
   }, duration)
 }
+
+export function seededRandom(dateISO) {
+  var x = Math.sin(new Date(dateISO).getTime()) * 10000;
+  return x - Math.floor(x);
+}
+
+export function random(dateISO, min, max) {
+  return Math.floor(seededRandom(dateISO) * (max - min + 1)) + min;
+}
+
+export function randomChoice(dateISO, array) {
+  return array[random(dateISO, 0, array.length - 1)];
+}
