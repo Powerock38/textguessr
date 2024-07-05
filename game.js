@@ -1,4 +1,4 @@
-import { log } from './utils.js';
+import { addRemoveClass, log } from './utils.js';
 
 const MIN_LETTERS_TO_REVEAL = 2;
 
@@ -84,7 +84,9 @@ export function initText() {
 export function sendInput(inputClean) {
   let foundOne = false;
 
-  for (const inputWord of inputClean.split(' ')) {
+  const words = inputClean.split('').map(c => c.toLowerCase() === c.toUpperCase() ? ' ' : c).join('').split(' ');
+
+  for (const inputWord of words) {
 
     if (WORDLIST.has(inputWord)) {
 
@@ -170,6 +172,8 @@ export function normalize(text) {
   return text.normalize('NFKD').replace(/[\u0300-\u036f]/g, "").toLowerCase();
 }
 
+const winDiv = document.getElementById('win');
+
 export function checkWin() {
   let firstLineWords = [];
   let i = 0;
@@ -182,5 +186,30 @@ export function checkWin() {
 
   if (firstLineWords.every(word => word.correct)) {
     log("You win!");
+
+    if (new URLSearchParams(window.location.search).has('funky')) {
+      const emojis = ['🎉', '✨', '🥳', '🎊', '🍾', '🌟', '🎁', '🔥', '🍻', '🎶', '❤️'];
+      for (let i = 0; i < 999; i++) {
+        const t = document.createElement('span');
+        t.innerText = emojis[Math.floor(Math.random() * emojis.length)]
+        winDiv.appendChild(t);
+
+        t.style.transition = `transform ${Math.random() * 2}s ease-in-out`;
+
+        let p = 0;
+        let interval = setInterval(() => {
+          t.style.transform = `translate(${(Math.random() * 100 - 50) * p}vw, ${(Math.random() * 100 - 50) * p}vh) rotate(${(Math.random() * 360) * p}deg)`;
+          p += 0.3 * Math.random();
+
+          if (p >= 1) {
+            clearInterval(interval);
+            t.remove();
+          }
+
+        }, Math.random() * 1000);
+      }
+    }
+
+    addRemoveClass(winDiv, 'win', 5000);
   }
 }

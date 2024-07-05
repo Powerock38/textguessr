@@ -1,5 +1,5 @@
 export function log() {
-  if (location.hostname.includes('localhost') || location.hostname.includes('0.0.0.0')) {
+  if (window.location.hostname.includes('localhost') || window.location.hostname.includes('0.0.0.0')) {
     console.log(...arguments);
   }
 }
