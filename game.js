@@ -71,7 +71,7 @@ export function initText() {
       for (const _ of token.value.split('')) {
         const letterElement = document.createElement('span');
         letterElement.classList.add('letter');
-        letterElement.innerText = '█';
+        letterElement.innerHTML = '&nbsp;';
         tokenElement.appendChild(letterElement);
       }
     }
@@ -81,8 +81,9 @@ export function initText() {
   }
 }
 
-// returns bool foundOne
+// returns nb found
 export function sendInput(inputClean) {
+  let found = 0;
   let foundOne = false;
 
   const words = inputClean.split('').map(c => c.toLowerCase() === c.toUpperCase() ? ' ' : c).join('').split(' ');
@@ -146,6 +147,10 @@ export function sendInput(inputClean) {
               foundOne = true;
             }
 
+            if (foundOne) {
+              found++;
+            }
+
             // Mark if word is fully revealed
             if ([...word.element.children].every(letterElement => letterElement.classList.contains('correct'))) {
               word.correct = true;
@@ -166,7 +171,7 @@ export function sendInput(inputClean) {
     }
   }
 
-  return foundOne;
+  return found;
 }
 
 export function normalize(text) {
@@ -215,4 +220,8 @@ export function checkWin() {
 
     addRemoveClass(winDiv, 'win', 5000);
   }
+}
+
+export function getPercentageFound() {
+  return Math.round(100 * TOKENS.filter(t => t.type === 'word' && t.correct).length / TOKENS.filter(t => t.type === 'word').length);
 }

@@ -35,8 +35,24 @@ h1 {
   font-family: inherit;
 }
 
-#input-wrapper {
+#input-stats-wrapper {
   width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+}
+
+#nb-found {
+  width: 1ch;
+}
+
+#percent-found {
+  width: 1ch;
+  direction: rtl;
+}
+
+#input-wrapper {
   display: flex;
   justify-content: center;
   margin: 20px 0;

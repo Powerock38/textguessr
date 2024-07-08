@@ -1,7 +1,7 @@
 import apis from './apis.js';
 import { loadSave, save } from './save.js';
 import { addRemoveClass, log } from './utils.js';
-import { initTokens, initText, normalize, sendInput, checkWin } from './game.js';
+import { initTokens, initText, normalize, sendInput, checkWin, getPercentageFound } from './game.js';
 
 const queryParams = new URLSearchParams(window.location.search);
 
@@ -55,19 +55,24 @@ if (LANG !== 'fr' && LANG !== 'en') {
 const inputWrapper = document.getElementById('input-wrapper');
 const input = document.getElementById('input');
 const inputButton = document.getElementById('input-button');
+const nbFoundDiv = document.getElementById('nb-found');
+const percentFoundDiv = document.getElementById('percent-found');
 
 inputButton.onclick = () => {
   const inputClean = normalize(input.value);
-  const foundOne = sendInput(inputClean);
+  const found = sendInput(inputClean);
 
-  if (foundOne) {
+  if (found) {
     save(inputClean);
     checkWin();
+    nbFoundDiv.innerText = `✅${found}`;
+    percentFoundDiv.innerText = `${getPercentageFound()}%`;
   } else {
     input.value = '';
     addRemoveClass(inputWrapper, 'shake', 500, () => {
       input.focus();
     });
+    nbFoundDiv.innerText = '❌';
   }
 }
 
