@@ -31,7 +31,7 @@
     </h1>
 
     <div>
-      <input type="date" id="date" />
+      <input type="date" id="date" onkeydown="return false" />
       <button id="delete-save">♻️ reset</button>
     </div>
   </div>
@@ -42,6 +42,11 @@
     <div id="input-wrapper">
       <input id="input" type="text" placeholder="..." />
       <button id="input-button">&gt;</button>
+
+      <details id="history-dropdown">
+        <summary></summary>
+        <div id="history"></div>
+      </details>
     </div>
 
     <div id="nb-found">❓</div>

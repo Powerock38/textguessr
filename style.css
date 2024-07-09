@@ -52,6 +52,38 @@ h1 {
   direction: rtl;
 }
 
+#history-dropdown {
+  margin-left: 10px;
+}
+
+#history-dropdown > summary {
+  list-style-type: "🕖";
+}
+
+#history-dropdown[open] > summary {
+  list-style-type: "🕟";
+}
+
+#history-dropdown > #history {
+  position: fixed;
+  background: white;
+  border: 1px solid black;
+  padding: 5px;
+  display: flex;
+  flex-direction: column-reverse;
+  max-height: 50vh;
+  overflow: scroll;
+}
+
+#history > span:hover {
+  cursor: pointer;
+  color: gray;
+}
+
+#history:empty {
+  display: none !important;
+}
+
 #input-wrapper {
   display: flex;
   justify-content: center;

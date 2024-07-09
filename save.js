@@ -15,9 +15,20 @@ function getSaveKey() {
   return `${LANG}|${API}|${DATE}`;
 }
 
-function getSaveValue() {
+export function getSaveValue() {
   let key = getSaveKey();
   return JSON.parse(localStorage.getItem(key) ?? '[]');
+}
+
+const historyDiv = document.getElementById('history');
+
+function addToHistory(guess) {
+  const span = document.createElement('span');
+  span.innerText = guess;
+  span.onclick = () => {
+    document.getElementById('input').value = guess;
+  }
+  historyDiv.appendChild(span);
 }
 
 export function save(guess) {
@@ -25,10 +36,12 @@ export function save(guess) {
   let key = getSaveKey();
   let save = JSON.parse(localStorage.getItem(key) ?? '[]');
   localStorage.setItem(key, JSON.stringify([...save, guess]));
+  addToHistory(guess);
 }
 
 export function loadSave() {
   for (const guess of getSaveValue()) {
     sendInput(guess);
+    addToHistory(guess);
   }
 }

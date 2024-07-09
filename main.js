@@ -1,5 +1,5 @@
 import apis from './apis.js';
-import { loadSave, save } from './save.js';
+import { loadSave, save, getSaveValue } from './save.js';
 import { addRemoveClass, log } from './utils.js';
 import { initTokens, initText, normalize, sendInput, checkWin, getPercentageFound } from './game.js';
 
@@ -76,10 +76,38 @@ inputButton.onclick = () => {
   }
 }
 
-input.addEventListener('keydown', e => {
+document.addEventListener('keydown', e => {
   if (e.key === 'Enter') {
     inputButton.click();
+  } else if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+    const save = getSaveValue();
+
+    if (save.length === 0) return;
+    const currentInput = normalize(input.value);
+
+    const currentIndex = save.indexOf(currentInput);
+
+    if (e.key === 'ArrowUp') {
+      if (currentIndex === -1) {
+        input.value = save[save.length - 1];
+      } else {
+        input.value = save[(currentIndex - 1 + save.length) % save.length];
+      }
+
+    } else {
+      if (currentIndex === -1) {
+        input.value = save[0];
+      } else {
+        input.value = save[(currentIndex + 1) % save.length];
+      }
+    }
+  } else if (e.key === 'Escape') {
+    input.value = '';
+  } else if (e.key === 'Backspace') {
+    input.value = input.value.slice(0, -1);
   }
+
+  input.focus();
 });
 
 async function init() {
