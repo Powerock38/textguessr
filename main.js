@@ -103,8 +103,6 @@ document.addEventListener('keydown', e => {
     }
   } else if (e.key === 'Escape') {
     input.value = '';
-  } else if (e.key === 'Backspace') {
-    input.value = input.value.slice(0, -1);
   }
 
   input.focus();
