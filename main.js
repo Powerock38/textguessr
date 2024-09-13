@@ -36,7 +36,7 @@ if (isNaN(new Date(DATE))) {
 }
 
 // Lang
-const DEFAULT_LANG = 'fr';
+const DEFAULT_LANG = navigator.language.startsWith('fr') ? 'fr' : 'en';
 export const LANG = queryParams.get("lang") ?? DEFAULT_LANG;
 const langSelect = document.getElementById('lang-select');
 langSelect.value = LANG;
